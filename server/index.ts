@@ -1,33 +1,14 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
-import { swaggerUI } from "@hono/swagger-ui";
-import { webApp } from "./routes/web/index.ts";
-import { adminApp } from "./routes/admin/index.ts";
+import { Hono } from 'hono'
+import birds from './data/birds.json' assert { type: 'json' }
 
-export const app = new OpenAPIHono().basePath("/api");
+//野鳥リスト取得エンドポイント
+const get_birdslist = new Hono()
+get_birdslist.get('', (c) => {
+  return c.json(birds)
+})
 
-app.route("/web", webApp);
+// honoメイン
+export const app = new Hono().basePath("/api")
+app.route('/get_birdslist', get_birdslist)
 
-if (process.env.APP_MODE == "ADMIN") {
-  app.route("/admin", adminApp);
-}
-
-app
-  .doc("/api/specification", {
-    openapi: "3.0.0",
-    info: {
-      title: "API",
-      version: "1.0.0",
-    },
-  })
-  .get(
-    "/swagger",
-    swaggerUI({
-      url: "api/specification",
-    })
-  );
-
-app.get("/hello2", (c) => {
-  return c.json({
-    message: "Hello Next.js2!",
-  });
-});
+app.fire()
