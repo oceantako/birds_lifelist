@@ -3,6 +3,7 @@
 
 import React from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Button} from "@heroui/react";
+import { Bird } from "@/types/bird";
 
 export const CheckIcon = () => {
   return (
@@ -46,8 +47,11 @@ export const EditIcon = () => {
   );
 };
 
+type Props = {
+  birds: Bird[];
+};
 
-export const Birds_table = () => {
+export const Birds_table = ({ birds }: Props) => {
 
   return (
     <Table aria-label="Example static collection table">

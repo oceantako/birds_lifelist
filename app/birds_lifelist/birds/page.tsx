@@ -1,7 +1,15 @@
 import { title } from "@/components/primitives";
-import { Birds_table } from "./components/birds_table"
+import { Birds_table } from "./components/birds_table";
+import { BirdList } from "@/types/bird";
 
-export default function Birds() {
+export default async function Birds() {
+
+  //野鳥一覧取得
+  const res = await fetch('http://localhost:3000/api/get_birdslist', {
+    cache: 'no-store',
+  });
+  const data: BirdList = await res.json();
+
   return (
     <div className="flex justify-center">
       <div className="w-full sm:w-full md:w-11/12 lg:w-2/3">
@@ -11,7 +19,8 @@ export default function Birds() {
         </section>
 
         <section className="">
-          <Birds_table></Birds_table>
+          <Birds_table birds={data.birds}></Birds_table>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
         </section>
 
 
