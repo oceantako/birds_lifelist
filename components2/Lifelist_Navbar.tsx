@@ -37,7 +37,7 @@ export const Lifelist_Navbar = () => {
   ];
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen} maxWidth="full">
+    <Navbar isBordered onMenuOpenChange={setIsMenuOpen} maxWidth="full">
       <NavbarContent className="">
 
         <NavbarMenuToggle

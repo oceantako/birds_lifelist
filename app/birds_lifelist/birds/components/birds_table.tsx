@@ -2,7 +2,7 @@
 "use client"
 
 import React from "react";
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Button} from "@heroui/react";
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Button, Pagination} from "@heroui/react";
 import { Bird } from "@/types/bird";
 
 export const CheckIcon = () => {
@@ -53,117 +53,81 @@ type Props = {
 
 export const Birds_table = ({ birds }: Props) => {
 
+    //観察ステータス
+    const renderStatusChip = (status: string | null) => {
+        if (!status) return <Chip color="default" startContent={<MinusIcon />} variant="flat">未観察</Chip>;
+        switch (status) {
+            case "observed":
+                return <Chip color="success" startContent={<CheckIcon />} variant="flat">観察済</Chip>;
+            case "not_observed":
+                return <Chip color="default" startContent={<MinusIcon />} variant="flat">未観察</Chip>;
+            case "uncertain":
+                return <Chip color="warning" startContent={<QuestionIcon />} variant="flat">あやふや</Chip>;
+            default:
+                return <Chip color="default" startContent={<MinusIcon />} variant="flat">未観察</Chip>;
+        }
+    };
+
+    //写真ランク
+    const renderPhotoChip = (photoRank: string | null) => {
+        if (!photoRank) return <Chip>写真なし...</Chip>;
+        switch (photoRank) {
+            case "none":
+                return <Chip>写真なし...</Chip>;
+            case "excellent":
+                return <Chip color="danger">Excellent!!</Chip>;
+            case "good":
+                return <Chip color="warning">Good!!</Chip>;
+            case "poor":
+                return <Chip color="secondary">いまいち</Chip>;
+            default:
+                return <Chip>写真なし...</Chip>;
+        }
+    };
+
+    // 日付フォーマット例（nullの場合は空欄）
+    const formatDate = (dateStr: string | null) => {
+        if (!dateStr) return "";
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("ja-JP", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
+
   return (
-    <Table aria-label="Example static collection table">
+    <Table aria-label="Bird list table">
         <TableHeader>
-            <TableColumn>野鳥</TableColumn>
+            <TableColumn allowsSorting={true}>野鳥</TableColumn>
             <TableColumn>観察状況</TableColumn>
             <TableColumn>写真</TableColumn>
             <TableColumn>直近観察日</TableColumn>
             <TableColumn>操作</TableColumn>
         </TableHeader>
-      <TableBody>
-        <TableRow key="1">
-            <TableCell>
-                <User
-                    avatarProps={{radius: "lg", src: ""}}
-                    description={"カモ目 カモ科 リュウキュウガモ属"}
-                    name={"リュウキュウガモ"}
-                >
-                    {""}
-                </User>
-            </TableCell>
-            <TableCell>
-                <Chip color="success" startContent={<CheckIcon/>} variant="flat">観察済</Chip>
-            </TableCell>
-            <TableCell>
-                <Chip color="danger">Excellent!!</Chip>
-            </TableCell>
-            <TableCell>
-                2025年7月12日
-            </TableCell>
-            <TableCell>
-                <Button isIconOnly aria-label="Like" color="primary" className="h-10" variant="bordered">
-                    <EditIcon />
-                </Button>
-            </TableCell>
-        </TableRow>
-        <TableRow key="1">
-            <TableCell>
-                <User
-                    avatarProps={{radius: "lg", src: ""}}
-                    description={"カモ目 カモ科 リュウキュウガモ属"}
-                    name={"リュウキュウガモ"}
-                >
-                    {""}
-                </User>
-            </TableCell>
-            <TableCell>
-                <Chip color="default" startContent={<MinusIcon/>} variant="flat">未観察</Chip>
-            </TableCell>
-            <TableCell>
-                <Chip color="warning">Good!!</Chip>
-            </TableCell>
-            <TableCell>
-                2025年7月12日
-            </TableCell>
-            <TableCell>
-                <Button isIconOnly aria-label="Like" color="primary" className="h-10" variant="bordered">
-                    <EditIcon />
-                </Button>
-            </TableCell>
-        </TableRow>
-        <TableRow key="1">
-            <TableCell>
-                <User
-                    avatarProps={{radius: "lg", src: ""}}
-                    description={"カモ目 カモ科 リュウキュウガモ属"}
-                    name={"リュウキュウガモ"}
-                >
-                    {""}
-                </User>
-            </TableCell>
-            <TableCell>
-                <Chip  color="warning" startContent={<QuestionIcon/>} variant="flat">あやふや</Chip>
-            </TableCell>
-            <TableCell>
-                <Chip color="secondary">いまいち</Chip>
-            </TableCell>
-            <TableCell>
-                2025年7月12日
-            </TableCell>
-            <TableCell>
-                <Button isIconOnly aria-label="Like" color="primary" className="h-10" variant="bordered">
-                    <EditIcon />
-                </Button>
-            </TableCell>
-        </TableRow>
-        <TableRow key="1">
-            <TableCell>
-                <User
-                    avatarProps={{radius: "lg", src: ""}}
-                    description={"カモ目 カモ科 リュウキュウガモ属"}
-                    name={"リュウキュウガモ"}
-                >
-                    {""}
-                </User>
-            </TableCell>
-            <TableCell>
-                <Chip color="success" startContent={<CheckIcon/>} variant="flat">観察済</Chip>
-            </TableCell>
-            <TableCell>
-                <Chip>写真なし...</Chip>
-            </TableCell>
-            <TableCell>
-                2025年7月12日
-            </TableCell>
-            <TableCell>
-                <Button isIconOnly aria-label="Like" color="primary" className="h-10" variant="bordered">
-                    <EditIcon />
-                </Button>
-            </TableCell>
-        </TableRow>
-      </TableBody>
+        <TableBody>
+            {birds.map((bird) => (
+                <TableRow key={bird.id}>
+                    <TableCell>
+                        <User
+                        avatarProps={{ radius: "lg", src: "" }}
+                        description={`${bird.taxonomy.order} ${bird.taxonomy.family} ${bird.taxonomy.genus}`}
+                        name={bird.name}
+                        >
+                        {""}
+                        </User>
+                    </TableCell>
+                    <TableCell>{renderStatusChip(bird.observation.status)}</TableCell>
+                    <TableCell>{renderPhotoChip(bird.observation.photo_rank)}</TableCell>
+                    <TableCell>{formatDate(bird.observation.last_observed_at)}</TableCell>
+                    <TableCell>
+                        <Button isIconOnly aria-label="Edit" color="primary" className="h-10" variant="bordered">
+                            <EditIcon />
+                        </Button>
+                    </TableCell>
+                </TableRow>
+            ))}
+        </TableBody>
     </Table>
   );
 }
