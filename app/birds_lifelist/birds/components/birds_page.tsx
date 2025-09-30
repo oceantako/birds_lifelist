@@ -31,11 +31,23 @@ export const Birds_page = ({ birds }: Props) => {
     const [totalPages, setTotalPages] = React.useState(Math.ceil(birds.length / per_page));
     const [currentBirds, setCurrentBirds] = React.useState<Bird[]>([]);
 
+    //検索文字列
+    const [searchWord, setSearchWord] = React.useState<string>("");
+
+    //検索処理用文字列（検索ボタン押下時に更新）
+    const [searchWordForFilter, setSearchWordForFilter] = React.useState<string>("");
+
     //ステータスドロップダウン
     const [statusSelectedKeys, setStatusSelectedKeys] = React.useState<Selection>(new Set(["not_observed","observed","uncertain"]));
 
     //写真ランクプドロップダウン
     const [photoRankSelectedKeys, setPhotoRankSelectedKeys] = React.useState<Selection>(new Set(["excellent","good","poor","none"]));
+
+    //検索ボタン押下時
+    const serchFromWords = () => {
+        setCurrentPage(1);
+        setSearchWordForFilter(searchWord);
+    }
 
     //ドロップダウンが選択されたら1ページに戻す
     React.useEffect(() => {
@@ -44,6 +56,11 @@ export const Birds_page = ({ birds }: Props) => {
 
     //野鳥フィルタリング
     React.useEffect(() => {
+        filteringBirds();
+    }, [birds, statusSelectedKeys, photoRankSelectedKeys, currentPage, searchWordForFilter]);
+
+    //野鳥フィルタリング
+    const filteringBirds = () => {
         const filtered_birds = birds.filter((bird) => {
             const status = bird.observation.status ?? "";
             const photoRank = bird.observation.photo_rank ?? "";
@@ -54,7 +71,15 @@ export const Birds_page = ({ birds }: Props) => {
             const isPhotoRankSelected =
             photoRankSelectedKeys === "all" || photoRankSelectedKeys.has(photoRank);
 
-            return isStatusSelected && isPhotoRankSelected;
+            const word = searchWordForFilter.trim().toLowerCase();
+            const isMatchedSearchWord =
+                word === "" ||
+                bird.name.toLowerCase().includes(word) ||
+                bird.taxonomy.order.toLowerCase().includes(word) ||
+                bird.taxonomy.family.toLowerCase().includes(word) ||
+                bird.taxonomy.genus.toLowerCase().includes(word);
+
+            return isStatusSelected && isPhotoRankSelected && isMatchedSearchWord;
         });
 
         const total = Math.ceil(filtered_birds.length / per_page);
@@ -62,8 +87,7 @@ export const Birds_page = ({ birds }: Props) => {
 
         const offset = (currentPage - 1) * per_page;
         setCurrentBirds(filtered_birds.slice(offset, offset + per_page));
-
-    }, [birds, statusSelectedKeys, photoRankSelectedKeys, currentPage]);
+    }
 
     return (
         <div className="flex justify-center">
@@ -71,8 +95,8 @@ export const Birds_page = ({ birds }: Props) => {
                 <section>
                     <div className="flex justify-between my-6">
                         <div className="flex h-12">
-                            <Input placeholder="種/目/属/科" variant={"bordered"} className="min-w-72 h-12"/>
-                            <Button color="primary" className="mx-3">検索</Button>
+                            <Input placeholder="種/目/属/科" variant={"bordered"} className="min-w-72 h-12" onChange={(e) => setSearchWord(e.target.value)}/>
+                            <Button color="primary" className="mx-3" onClick={serchFromWords}>検索</Button>
                         </div>
                         <div className="flex">
                             <div className="h-12 mx-4">

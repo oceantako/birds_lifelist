@@ -52,13 +52,13 @@ export const Lifelist_Navbar = () => {
         </NavbarItem>
 
         <NavbarItem className="hidden sm:flex">
-          <Link color="foreground" href="#">
+          <Link color="foreground" href="/birds_lifelist/birds">
             日本の野鳥
           </Link>
         </NavbarItem>
 
         <NavbarItem className="hidden sm:flex">
-          <Link color="foreground" href="#">
+          <Link color="foreground" href="/birds_lifelist/edit_bird">
             ダッシュボード
           </Link>
         </NavbarItem>
